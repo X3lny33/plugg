@@ -1,0 +1,18 @@
+{
+    "name": "caps-plug",
+    "displayName": "CAPS PLUG",
+    "description": "Converts selected text to uppercase",
+    "version": "1.0.0",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": ["Other"],
+    "activationEvents": ["onCommand:caps-plug.convertToUppercase"],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [{
+            "command": "caps-plug.convertToUppercase",
+            "title": "Convert to UPPERCASE"
+        }]
+    }
+}
