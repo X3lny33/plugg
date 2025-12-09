@@ -1,25 +1,42 @@
+import yaml
 
-name: CI
+with open('.github/workflows/main.yml', 'r') as file:
+    data = yaml.safe_load(file)
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+print("=== ПРОВЕРКА main.yml ===")
+print()
 
-  workflow_dispatch:
+print("1. Имя workflow:", data.get('name', 'НЕТ'))
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# 2. Проверяем триггер
+if 'on' in data and 'push' in data['on']:
+    print("2. Триггер push: ЕСТЬ")
+else:
+    print("2. Триггер push: НЕТ")
 
-    steps:
-      - uses: actions/checkout@v4
+if 'jobs' in data and 'test' in data['jobs']:
+    print("3. Job 'test': ЕСТЬ")
+    job = data['jobs']['test']
+    
+    if 'strategy' in job and 'matrix' in job['strategy']:
+        os_list = job['strategy']['matrix'].get('os', [])
+        print(f"4. OS в matrix: {os_list}")
+        
+        if 'ubuntu-latest' in os_list and 'windows-latest' in os_list:
+            print("   ubuntu-latest: ЕСТЬ, windows-latest: ЕСТЬ")
+        else:
+            print("   ubuntu-latest: НЕТ, windows-latest: НЕТ")
+    else:
+        print("4. Matrix OS: НЕТ")
+    
+    if 'steps' in job:
+        print(f"5. Количество шагов: {len(job['steps'])}")
+        for step in job['steps']:
+            print(f"   - {step.get('name', 'Без имени')}")
+    else:
+        print("5. Шаги: НЕТ")
+else:
+    print("3. Job 'test': НЕТ")
 
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+print()
+print("=== ПРОВЕРКА ЗАВЕРШЕНА ===")
