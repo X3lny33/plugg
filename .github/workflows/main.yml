@@ -1,42 +1,23 @@
 import yaml
 
-with open('.github/workflows/main.yml', 'r') as file:
-    data = yaml.safe_load(file)
+with open('.github/workflows/main.yml', 'r') as f:
+    data = yaml.safe_load(f)
 
-print("=== ПРОВЕРКА main.yml ===")
-print()
+print("Проверка файла main.yml")
+print("-----------------------")
 
-print("1. Имя workflow:", data.get('name', 'НЕТ'))
+print("Имя:", data.get('name'))
 
-# 2. Проверяем триггер
-if 'on' in data and 'push' in data['on']:
-    print("2. Триггер push: ЕСТЬ")
-else:
-    print("2. Триггер push: НЕТ")
+if 'on' in data:
+    print("Триггер push: да")
 
 if 'jobs' in data and 'test' in data['jobs']:
-    print("3. Job 'test': ЕСТЬ")
     job = data['jobs']['test']
     
-    if 'strategy' in job and 'matrix' in job['strategy']:
-        os_list = job['strategy']['matrix'].get('os', [])
-        print(f"4. OS в matrix: {os_list}")
-        
-        if 'ubuntu-latest' in os_list and 'windows-latest' in os_list:
-            print("   ubuntu-latest: ЕСТЬ, windows-latest: ЕСТЬ")
-        else:
-            print("   ubuntu-latest: НЕТ, windows-latest: НЕТ")
-    else:
-        print("4. Matrix OS: НЕТ")
+    if 'strategy' in job:
+        os_list = job['strategy']['matrix']['os']
+        print("OS в matrix:", os_list)
     
-    if 'steps' in job:
-        print(f"5. Количество шагов: {len(job['steps'])}")
-        for step in job['steps']:
-            print(f"   - {step.get('name', 'Без имени')}")
-    else:
-        print("5. Шаги: НЕТ")
-else:
-    print("3. Job 'test': НЕТ")
-
-print()
-print("=== ПРОВЕРКА ЗАВЕРШЕНА ===")
+    print("Шаги:")
+    for step in job['steps']:
+        print("  -", step['name'])
