@@ -1,23 +1,44 @@
-import yaml
+name: JavaScript Tests
 
-with open('.github/workflows/main.yml', 'r') as f:
-    data = yaml.safe_load(f)
+on:
+  push:
+    branches: [ main ]
 
-print("Проверка файла main.yml")
-print("-----------------------")
-
-print("Имя:", data.get('name'))
-
-if 'on' in data:
-    print("Триггер push: да")
-
-if 'jobs' in data and 'test' in data['jobs']:
-    job = data['jobs']['test']
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     
-    if 'strategy' in job:
-        os_list = job['strategy']['matrix']['os']
-        print("OS в matrix:", os_list)
+    steps:
+    - uses: actions/checkout@v4
     
-    print("Шаги:")
-    for step in job['steps']:
-        print("  -", step['name'])
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Создание package.json
+      run: |
+        cat > package.json << 'EOF'
+        {
+          "name": "js-test",
+          "version": "1.0.0",
+          "scripts": {
+            "test": "node test.js"
+          }
+        }
+        EOF
+    
+    - name: Создание тестов
+      run: |
+        # Основной тестовый файл
+        cat > test.js << 'EOF'
+        const assert = require('assert');
+        
+        // Тестируемые функции
+        const math = {
+          add: (a, b) => a + b,
+          subtract: (a, b) => a - b,
+         
