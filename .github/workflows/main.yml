@@ -1,8 +1,5 @@
-name: JavaScript Tests
-
-on:
-  push:
-    branches: [ main ]
+name: JavaScript Test
+on: [push]
 
 jobs:
   test:
@@ -10,35 +7,29 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-    
+
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Node.js
+    - name: Setup Node
       uses: actions/setup-node@v4
       with:
         node-version: '20'
     
-    - name: Создание package.json
+    - name: Create and run test (Linux)
+      if: runner.os == 'Linux'
       run: |
-        cat > package.json << 'EOF'
-        {
-          "name": "js-test",
-          "version": "1.0.0",
-          "scripts": {
-            "test": "node test.js"
-          }
-        }
-        EOF
-    
-    - name: Создание тестов
-      run: |
-        # Основной тестовый файл
         cat > test.js << 'EOF'
-        const assert = require('assert');
-        
-        // Тестируемые функции
-        const math = {
-          add: (a, b) => a + b,
-          subtract: (a, b) => a - b,
-         
+        function sum(a,b){return a+b}
+        if(sum(2,3)!==5){console.error("Error");process.exit(1)}
+        console.log("Test passed")
+        EOF
+        node test.js
+    
+    - name: Create and run test (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        echo "function sum(a,b){return a+b}" > test.js
+        echo "if(sum(2,3)!==5){console.error('Error');process.exit(1)}" >> test.js
+        echo "console.log('Test passed')" >> test.js
+        node test.js
